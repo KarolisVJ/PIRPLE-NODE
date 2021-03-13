@@ -44,7 +44,7 @@ httpsServer.listen(config.httpsPort,function(){
 });
 
 // All the server logic for both the http and https createServer
-var unifiedServer = function(req,res) {
+var unifiedServer = async function(req,res) {
 
   // Parse the url
   var parsedUrl = url.parse(req.url, true);
@@ -55,6 +55,7 @@ var unifiedServer = function(req,res) {
 
   // Get the query string as an object
   var queryStringObject = parsedUrl.query;
+  console.log(queryStringObject)
 
   // Get the HTTP method
   var method = req.method.toLowerCase();
@@ -68,12 +69,11 @@ var unifiedServer = function(req,res) {
 
   req.on('data', function(data){
     buffer += decoder.write(data);
-    console.log('First buffer', buffer)
+ 
    });
  
-   req.on('end', function(data){
-     buffer += decoder.end(data);
-     console.log('Second buffer', buffer)
+   await req.on('end', function(data){
+     buffer +=  decoder.end(data);
    })
 
 

@@ -14,6 +14,9 @@ var handlers = require('./lib/handlers');
 var helpers = require('./lib/helpers');
 
 
+helpers.sendTwilioSms('7604926712','Labaa dienaa', function(err){
+  console.log('There was this error', err)
+})
 
  // Instantiate the http server
 var httpServer = http.createServer(function(req,res){
@@ -55,13 +58,14 @@ var unifiedServer = async function(req,res) {
 
   // Get the query string as an object
   var queryStringObject = parsedUrl.query;
-  console.log(queryStringObject)
+ 
 
   // Get the HTTP method
   var method = req.method.toLowerCase();
 
   //Get the headers as an object
   var headers = req.headers;
+  console.log('Headers', headers)
 
   // Get the payload if any
   var decoder = new StringDecoder('utf8');
@@ -69,14 +73,11 @@ var unifiedServer = async function(req,res) {
 
   req.on('data', function(data){
     buffer += decoder.write(data);
- 
    });
  
-   await req.on('end', function(data){
+await req.on('end', function(data){
      buffer +=  decoder.end(data);
-   })
-
-
+    })
 
 
 
@@ -92,12 +93,16 @@ let data = {
   'headers': headers,
   'payload': helpers.parseJsonToObject(buffer)
 }
+
+
+
 // route the request to the handler specified in the router 
 chosenHandler(data, function(statusCode, payload){
    //use the status code called back by the handler to
    statusCode = typeof(statusCode) == 'number' ? statusCode : 200;
    //use the payload called back by the handler
    payload = typeof(payload) == 'object' ? payload : {};
+  
    var payloadString = JSON.stringify(payload);
 
   // Send the response
@@ -120,4 +125,6 @@ var router = {
   "lol": handlers.pSimtai,
   "ping": handlers.ping,
   "users": handlers.users,
+  "tokens": handlers.tokens,
+  "checks": handlers.checks
 }
